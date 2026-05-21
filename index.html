@@ -1,0 +1,1322 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>İrem 23</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper:     #faf6ef;
+      --cream:     #f4ead6;
+      --parchment: #ede0c4;
+      --ink:       #1e1410;
+      --muted:     #7a6555;
+      --rose:      #c04b60;
+      --coral:     #c8634a;
+      --sun:       #e0b84e;
+      --mint:      #4f9178;
+      --blue:      #4a6696;
+      --shadow:    0 22px 70px rgba(30,20,16,.14);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; min-height: 100%; color: var(--ink);
+      background-color: var(--cream);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 12% 8%, rgba(224,184,78,.28), transparent 30rem),
+        radial-gradient(ellipse at 88% 15%, rgba(79,145,120,.18), transparent 24rem),
+        linear-gradient(160deg, #faf0de 0%, #f8e8d0 50%, #f0e8d8 100%);
+      font-family: 'Lora', Georgia, serif;
+    }
+    html { overflow-y: auto; scroll-behavior: smooth; scroll-snap-type: y proximity; }
+    button, input { font: inherit; }
+
+    /* LOCK */
+    .lock {
+      position: fixed; inset: 0; z-index: 50;
+      display: grid; place-items: center; padding: 24px;
+      background:
+        linear-gradient(rgba(250,246,239,.88), rgba(244,234,214,.94)),
+        repeating-linear-gradient(135deg, rgba(192,75,96,.12) 0 12px, rgba(224,184,78,.12) 12px 24px);
+    }
+    .lock.hidden { display: none; }
+    .lock-box {
+      width: min(440px, 100%); padding: clamp(24px,5vw,42px);
+      border: 1px solid rgba(30,20,16,.14); border-radius: 28px;
+      background: rgba(250,246,239,.97); box-shadow: var(--shadow); text-align: center;
+    }
+    .lock h1 {
+      margin: 0 0 10px; font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem,9vw,3.8rem); line-height: .95;
+    }
+    .lock p { margin: 0 0 22px; color: var(--muted); line-height: 1.6; font-size: .97rem; }
+    .password-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .password-row input {
+      width: 100%; min-width: 0; border: 2px solid rgba(30,20,16,.16);
+      border-radius: 14px; padding: 14px 16px; background: white;
+      color: var(--ink); outline: none; font-family: 'Lora', Georgia, serif;
+    }
+    .password-row input:focus { border-color: var(--rose); }
+    .btn {
+      border: 0; border-radius: 14px; padding: 14px 18px; color: white;
+      background: var(--ink); cursor: pointer; font-family: 'Caveat', cursive;
+      font-size: 1.1rem; font-weight: 700;
+      transition: transform .18s ease, filter .18s ease;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    .btn:active { transform: translateY(0); }
+    .error { min-height: 24px; margin-top: 12px; color: #a63040; font-size: .9rem; font-family: 'Caveat', cursive; }
+
+    /* APP */
+    .app {
+      min-height: 100dvh; display: block;
+    }
+    .topbar {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px; z-index: 10;
+      position: sticky; top: 0;
+      padding: 11px clamp(14px,2.5vw,28px);
+      background: rgba(250,246,239,.96); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(30,20,16,.08);
+    }
+    .bottombar {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px; z-index: 10;
+      position: sticky; bottom: 0;
+      padding: 10px clamp(14px,2.5vw,28px);
+      background: rgba(250,246,239,.96); backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(30,20,16,.08);
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 10px; min-width: 0;
+      color: var(--muted); font-family: 'Caveat', cursive; font-size: 1.1rem; font-weight: 600;
+    }
+    .brand-dot { color: var(--rose); flex: 0 0 auto; }
+    .counter { color: var(--muted); font-family: 'Caveat', cursive; font-size: 1.05rem; font-weight: 600; white-space: nowrap; }
+
+    /* STAGE */
+    .stage {
+      position: relative;
+    }
+    .slides {
+      display: block; height: auto;
+    }
+    .slide {
+      width: 100%; min-height: 100svh; height: auto;
+      padding: clamp(32px,5vw,72px) clamp(20px,4vw,72px);
+      display: grid; align-items: center;
+      position: relative; overflow: hidden;
+      scroll-snap-align: start;
+    }
+    .slide::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      opacity: .55;
+    }
+    .slide::after {
+      content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+      background:linear-gradient(110deg,transparent 0 30%,rgba(255,255,255,.42) 46%,transparent 62% 100%);
+      transform:translateX(-120%); opacity:0;
+    }
+    .slide.in-view::after { animation: slideSheen .9s cubic-bezier(.2,.8,.2,1) .08s both; }
+    .slide.out-view { animation: slideExit .6s cubic-bezier(.4,0,.6,1) forwards; }
+    .slide.out-view::after { animation: none !important; }
+    .slide-inner {
+      position: relative; z-index: 1; width: min(1120px,100%); margin: 0 auto;
+      display: grid; grid-template-columns: minmax(0,1.05fr) minmax(280px,.95fr);
+      align-items: center; gap: clamp(22px,4vw,56px);
+    }
+    .slide.center .slide-inner { grid-template-columns: 1fr; text-align: center; max-width: 980px; }
+    .slide.media-left .slide-inner { grid-template-columns: minmax(280px,.95fr) minmax(0,1.05fr); }
+    .slide.media-left .copy { order: 2; }
+    .slide.media-left .visual { order: 1; }
+
+    /* TYPOGRAPHY */
+    .eyebrow {
+      display: inline-flex; align-items: center; width: fit-content;
+      gap: 8px; margin-bottom: 16px; padding: 7px 14px;
+      border: 1px solid rgba(30,20,16,.14); border-radius: 999px;
+      background: rgba(250,246,239,.72); color: var(--eyebrow-color, var(--muted));
+      font-family: 'Caveat', cursive; font-weight: 600; font-size: 1.08rem; letter-spacing: .03em;
+    }
+    h2 {
+      margin: 0; font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem,4.2vw,3.6rem); line-height: 1; font-weight: 700;
+    }
+    h3 {
+      margin: 0; font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.8rem,5vw,4rem); line-height: 1; font-weight: 700;
+    }
+    .lead { margin: 18px 0 0; color: #3a342f; font-family: 'Lora', Georgia, serif; font-size: clamp(1.26rem,2.5vw,1.68rem); line-height: 1.6; }
+    .mini { margin-top: 18px; color: var(--muted); font-size: 1.08rem; line-height: 1.55; }
+    .quote {
+      margin-top: 22px; padding: 18px 22px;
+      border-left: 4px solid var(--accent-local, var(--rose)); border-radius: 3px 16px 16px 3px;
+      background: rgba(255,252,230,.88); color: #2c2926;
+      font-family: 'Lora', Georgia, serif; font-style: italic;
+      font-size: clamp(1.02rem,2vw,1.22rem); line-height: 1.55;
+      box-shadow: 2px 4px 14px rgba(30,20,16,.08);
+    }
+    .quote small { display: block; margin-top: 10px; color: var(--muted); font-style: normal; font-family: 'Caveat', cursive; font-size: .95rem; font-weight: 600; }
+
+    /* VISUAL */
+    .visual { min-width: 0; display: grid; gap: 14px; justify-items: center; }
+
+    /* POLAROID */
+    .photo-wrap { display: inline-block; position: relative; filter: drop-shadow(0 5px 14px rgba(30,20,16,.20)); }
+    .photo-wrap .photo { transition: transform .25s ease, filter .25s ease; }
+    .photo-wrap:hover .photo { transform: rotate(calc(var(--tilt,-2deg) * .35)) scale(1.025); filter: sepia(.03) saturate(.97) brightness(1.05); }
+    .photo {
+      width: min(100%,420px); height: auto; display: block; background: white;
+      border: 10px solid #fff; border-bottom-width: 44px; border-radius: 3px;
+      transform: rotate(var(--tilt,-2deg)); filter: sepia(.07) saturate(.93) brightness(1.02);
+    }
+    .photo.wide { width: min(100%,540px); aspect-ratio: 16 / 10; }
+    .photo-caption {
+      position: absolute; bottom: 8px; left: 0; right: 0; text-align: center;
+      font-family: 'Caveat', cursive; font-size: 1.0rem; font-weight: 600; color: #5a4030; pointer-events: none;
+    }
+    .caption { color: var(--muted); font-family: 'Caveat', cursive; font-weight: 600; font-size: .95rem; text-align: center; }
+
+    /* PHOTO GRID */
+    .photo-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; width: min(100%,520px); }
+    .photo-grid img { width: 100%; height: auto; background: #fff; border: 6px solid #fff; border-bottom-width: 24px; border-radius: 2px; box-shadow: 1px 2px 8px rgba(30,20,16,.14); filter: sepia(.05) saturate(.95); }
+    .photo-grid img:nth-child(odd)  { transform: rotate(-1.5deg); }
+    .photo-grid img:nth-child(even) { transform: rotate(1.2deg); }
+
+    /* STICKER GRID */
+    .sticker-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; width: min(100%,520px); }
+    .sticker-grid img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 16px; background: rgba(255,255,255,.72); padding: 8px; box-shadow: 0 8px 20px rgba(30,20,16,.10); }
+    .sticker-grid div { aspect-ratio: 1; border-radius: 16px; box-shadow: 0 8px 20px rgba(30,20,16,.10); }
+
+    /* CHAT BUBBLES */
+    .chat-stack { display: grid; gap: 10px; width: min(100%,520px); }
+    .bubble { max-width: 88%; padding: 11px 16px; line-height: 1.4; font-family: 'Caveat', cursive; font-size: 1.18rem; }
+    .bubble.me { justify-self: end; background: #e8f5ee; border: 1px solid rgba(79,145,120,.25); border-radius: 16px 4px 4px 16px; border-right: 3px solid var(--accent-local, var(--mint)); color: #1e3a2f; }
+    .bubble.her { justify-self: start; background: #fefce8; border: 1px solid rgba(224,184,78,.28); border-radius: 4px 16px 16px 4px; border-left: 3px solid #c8a63a; color: #3a3010; }
+
+    /* STATS — index cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 24px; }
+    .stat {
+      min-height: 108px; padding: 16px; border-radius: 4px; background: white;
+      border: 1px solid rgba(30,20,16,.08); border-left: 5px solid var(--sun);
+      box-shadow: 2px 3px 10px rgba(30,20,16,.09); position: relative; overflow: hidden;
+    }
+    .stat::after {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 28px;
+      background: repeating-linear-gradient(transparent,transparent 27px,rgba(30,20,16,.055) 27px,rgba(30,20,16,.055) 28px);
+      pointer-events: none;
+    }
+    .stat b { display: block; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(1.5rem,3.8vw,2.8rem); line-height: 1; color: var(--accent-local, var(--rose)); }
+    .stat span { display: block; margin-top: 6px; color: var(--muted); font-family: 'Caveat', cursive; font-size: 1rem; line-height: 1.3; }
+
+    /* BADGES */
+    .badge-row, .timeline, .wish-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .badge { display: inline-flex; align-items: center; min-height: 36px; padding: 8px 14px; border-radius: 999px; background: rgba(250,246,239,.9); border: 1px solid rgba(30,20,16,.14); color: #2f2b27; font-family: 'Caveat', cursive; font-weight: 600; font-size: 1.05rem; box-shadow: 1px 2px 6px rgba(30,20,16,.07); }
+    .timeline .badge:nth-child(3n+1) { background: rgba(192,75,96,.1);   border-color: rgba(192,75,96,.2); }
+    .timeline .badge:nth-child(3n+2) { background: rgba(224,184,78,.15); border-color: rgba(224,184,78,.25); }
+    .timeline .badge:nth-child(3n)   { background: rgba(79,145,120,.12); border-color: rgba(79,145,120,.22); }
+
+    /* VIDEO */
+    .video-strip { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; width: min(100%,560px); }
+    video { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 12px; background: #111; box-shadow: 0 10px 26px rgba(30,20,16,.14); border: 3px solid white; }
+
+    /* BIG NUMBER */
+    .big-number { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(5rem,18vw,12rem); line-height: .85; font-weight: 900; font-style: italic; color: var(--rose); letter-spacing: -.02em; }
+
+    /* POSTCARD LETTER */
+    .postcard-wrap {
+      position: relative; background: #fffef8; border: 1px solid #d4c5a9; border-radius: 4px;
+      padding: clamp(22px,4vw,40px) clamp(22px,4vw,116px) clamp(22px,4vw,40px) clamp(22px,4vw,44px);
+      box-shadow: 3px 4px 16px rgba(30,20,16,.13); text-align: left;
+      background-image: repeating-linear-gradient(transparent,transparent 27px,rgba(180,155,115,.16) 27px,rgba(180,155,115,.16) 28px);
+    }
+    .postcard-wrap::after {
+      content: "✦ 23 ✦"; position: absolute; top: 20px; right: 24px;
+      width: 52px; height: 64px; border: 2px solid var(--rose);
+      display: grid; place-items: center;
+      font-family: 'Playfair Display', Georgia, serif; font-size: .78rem; color: var(--rose);
+      box-shadow: inset 0 0 0 3px rgba(192,75,96,.10);
+    }
+    .postcard-wrap p { font-family: 'Lora', Georgia, serif; font-size: clamp(1.05rem,2vw,1.2rem); line-height: 1.85; margin: 0 0 16px; color: #2a1e18; }
+    .postcard-wrap p:last-child { margin-bottom: 0; }
+
+    /* FIVE THINGS */
+    .five-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; margin-top: 24px; }
+    .five-card { background: white; border: 1px solid rgba(30,20,16,.08); border-top: 4px solid var(--rose); border-radius: 3px; padding: 16px; box-shadow: 2px 3px 8px rgba(30,20,16,.09); position: relative; }
+    .five-card:nth-child(2n) { border-top-color: var(--mint); }
+    .five-card:nth-child(3n) { border-top-color: var(--sun); }
+    .five-card:nth-child(4)  { border-top-color: var(--blue); }
+    .five-card .num { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; font-style: italic; color: rgba(30,20,16,.08); line-height: 1; position: absolute; top: 6px; right: 10px; }
+    .five-card strong { display: block; font-family: 'Caveat', cursive; font-size: 1.12rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .five-card p { margin: 0; font-family: 'Lora', serif; font-size: .88rem; line-height: 1.45; color: var(--muted); }
+
+    /* NAV */
+    .nav { display: inline-flex; gap: 8px; }
+    .icon-btn { width: 46px; height: 46px; border: 1px solid rgba(30,20,16,.14); border-radius: 50%; background: rgba(250,246,239,.88); color: var(--ink); cursor: pointer; font-size: 1.4rem; line-height: 1; box-shadow: 0 6px 14px rgba(30,20,16,.08); transition: transform .15s ease, box-shadow .15s ease; }
+    .icon-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(30,20,16,.12); }
+    .icon-btn:active { transform: translateY(0); box-shadow: 0 2px 6px rgba(30,20,16,.08); }
+    .icon-btn.pulse { animation: buttonPulse .4s cubic-bezier(.4,0,.6,1); }
+    .dots { display: flex; gap: 6px; align-items: center; overflow: hidden; max-width: min(58vw,720px); }
+    .dot { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; background: rgba(30,20,16,.20); border: 0; padding: 0; cursor: pointer; transition: all .2s ease; }
+    .dot.active { width: 24px; border-radius: 999px; background: var(--rose); }
+
+    /* CONFETTI */
+    .confetti { pointer-events: none; position: fixed; inset: 0; overflow: hidden; z-index: 4; }
+    .piece { position: absolute; top: -24px; width: 10px; height: 16px; border-radius: 3px; opacity: .9; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    /* THEMES */
+    .theme-rose  { background: #fdf0f2; }
+    .theme-sun   { background: #fdf7e8; }
+    .theme-mint  { background: #eef8f4; }
+    .theme-blue  { background: #eff4fa; }
+    .theme-coral { background: #fdf2ec; }
+
+    /* ERA COLORS */
+    .slide.era-1 { --eyebrow-color:#b84030; --accent-local:#c04b60; background:#ede0cc; }
+    .slide.era-2 { --eyebrow-color:#c8634a; --accent-local:#c8634a; background:#f0e4c0; }
+    .slide.era-3 { --eyebrow-color:#c8a832; --accent-local:#e0b84e; background:#ece8d5; }
+    .slide.era-4 { --eyebrow-color:#4a6696; --accent-local:#4a6696; background:#e4e8ec; }
+    .slide.era-5 { --eyebrow-color:#4f9178; --accent-local:#4f9178; background:#eeece6; }
+
+    /* BUBBLE YEAR LABEL */
+    .bubble-label {
+      font-family: 'Caveat', cursive; font-size: .78rem;
+      color: var(--muted); opacity: .65; margin-bottom: 2px; padding-left: 4px;
+    }
+
+    /* STAT BARS */
+    .stat-bars { width: min(100%,680px); margin: 0 auto; }
+    .stat-bar-row { margin-bottom: 18px; }
+    .stat-bar-label { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; }
+    .stat-bar-label span { font-family:'Caveat',cursive; font-weight:700; font-size:1.45rem; color:var(--ink); }
+    .stat-bar-label em { font-family:'Caveat',cursive; font-size:1.26rem; color:var(--eyebrow-color,var(--muted)); font-style:normal; font-weight:600; }
+    .stat-bar-track { height:13px; background:rgba(30,20,16,.10); border-radius:7px; overflow:hidden; }
+    .stat-bar-fill { height:100%; background:var(--accent-local,var(--rose)); border-radius:5px; }
+    .stat-bar-source { font-family:'Caveat',cursive; font-size:1.08rem; color:var(--muted); opacity:.78; margin-top:4px; font-style:italic; }
+    .stat-note { font-family:'Caveat',cursive; font-size:1.05rem; color:var(--muted); opacity:.65; margin-top:22px; text-align:center; letter-spacing:.03em; }
+
+    /* WHATSAPP WRAPPED */
+    .wrapped-grid { display:grid; grid-template-columns:minmax(240px,.82fr) minmax(0,1.18fr); gap:28px; margin-top:24px; align-items:stretch; text-align:left; }
+    .wrapped-hero { display:flex; flex-direction:column; justify-content:center; gap:14px; padding:24px 26px; background:rgba(255,255,255,.58); border:1px solid rgba(30,20,16,.08); border-radius:12px; box-shadow:0 12px 30px rgba(30,20,16,.08); }
+    .wrapped-number { font-family:'Playfair Display',Georgia,serif; font-weight:900; font-style:italic; font-size:clamp(4.2rem,10vw,7.6rem); line-height:.86; color:var(--accent-local,var(--rose)); letter-spacing:0; }
+    .wrapped-title { font-family:'Caveat',cursive; font-size:1.55rem; font-weight:700; color:var(--ink); line-height:1.08; }
+    .wrapped-sub { font-family:'Lora',Georgia,serif; color:#3a342f; font-size:1.08rem; line-height:1.55; margin:0; }
+    .wrapped-proof { display:grid; gap:16px; }
+    .year-bars { height:245px; display:grid; grid-template-columns:repeat(9,minmax(0,1fr)); align-items:end; gap:9px; padding:16px 10px 8px; border-bottom:2px solid rgba(30,20,16,.16); }
+    .year-bar { min-width:0; height:var(--h); display:flex; align-items:end; justify-content:center; position:relative; border-radius:8px 8px 2px 2px; background:linear-gradient(180deg,rgba(192,75,96,.92),rgba(74,102,150,.92)); box-shadow:0 8px 18px rgba(30,20,16,.12); }
+    .year-bar::before { content:attr(data-count); position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); color:var(--ink); font-family:'Caveat',cursive; font-size:.95rem; font-weight:700; white-space:nowrap; display:none; }
+    .year-bar span { position:absolute; bottom:-29px; left:50%; transform:translateX(-50%); font-family:'Caveat',cursive; font-size:1rem; font-weight:700; color:var(--muted); }
+    .insight-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:26px; }
+    .insight { min-height:82px; padding:13px 14px; border-left:5px solid var(--accent-local,var(--rose)); background:rgba(255,255,255,.64); border-radius:7px; box-shadow:0 8px 18px rgba(30,20,16,.07); }
+    .insight b { display:block; font-family:'Playfair Display',Georgia,serif; font-size:1.72rem; line-height:.95; color:var(--accent-local,var(--rose)); }
+    .insight span { display:block; margin-top:6px; font-family:'Caveat',cursive; font-size:1.08rem; line-height:1.18; color:var(--muted); font-weight:700; }
+    .wrapped-foot { font-family:'Caveat',cursive; font-size:1.15rem; color:var(--muted); text-align:center; margin:18px 0 0; }
+
+    /* DATA STORY SLIDES */
+    .chart-shell { width:min(100%,980px); margin:26px auto 0; }
+    .chart-note { margin:18px auto 0; max-width:780px; color:var(--muted); font-family:'Caveat',cursive; font-size:1.28rem; line-height:1.28; text-align:center; }
+    .chart-legend { display:flex; justify-content:center; flex-wrap:wrap; gap:10px 16px; margin-top:18px; }
+    .legend-item { display:inline-flex; align-items:center; gap:7px; font-family:'Caveat',cursive; font-size:1.16rem; color:var(--muted); font-weight:700; }
+    .legend-dot { width:12px; height:12px; border-radius:50%; background:var(--c); box-shadow:0 2px 6px rgba(30,20,16,.12); }
+    .c-creative { --c:#c8634a; }
+    .c-logistics { --c:#4a6696; }
+    .c-school { --c:#e0b84e; }
+    .c-warm { --c:#c04b60; }
+    .c-career { --c:#4f9178; }
+    .c-fitness { --c:#7657a8; }
+    .c-coffee { --c:#8a5a3c; }
+
+    .stream-chart {
+      height:400px; display:grid; grid-template-columns:repeat(9,minmax(0,1fr));
+      gap:14px; align-items:end; padding:24px 18px 44px;
+      border-bottom:2px solid rgba(30,20,16,.16);
+      background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.08));
+      border-radius:14px 14px 0 0;
+    }
+    .stream-year {
+      height:100%; display:flex; flex-direction:column-reverse; justify-content:flex-start;
+      gap:2px; position:relative; min-width:0; align-items:stretch;
+    }
+    .stream-year::after {
+      content:attr(data-year); position:absolute; left:50%; bottom:-34px; transform:translateX(-50%);
+      color:var(--muted); font-family:'Caveat',cursive; font-size:1.08rem; font-weight:700;
+    }
+    .stream-year::before {
+      content:attr(data-total); position:absolute; left:50%; bottom:calc(var(--total) * 1% + 10px);
+      transform:translateX(-50%); color:rgba(30,20,16,.62);
+      font-family:'Caveat',cursive; font-size:.9rem; font-weight:700; opacity:.85; display:none;
+    }
+    .stream-band {
+      height:calc(var(--v) * 1%); min-height:var(--min,0); border-radius:4px;
+      background:linear-gradient(180deg,color-mix(in srgb,var(--c),white 10%),var(--c));
+      box-shadow:0 4px 10px rgba(30,20,16,.08); transform-origin:bottom;
+    }
+    .stream-band:first-child { border-radius:4px 4px 10px 10px; }
+    .stream-band:last-child { border-radius:10px 10px 4px 4px; }
+
+    .lore-map { position:relative; width:min(100%,900px); height:470px; margin:26px auto 0; }
+    .lore-lines { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+    .lore-lines line { stroke:rgba(30,20,16,.18); stroke-width:2; stroke-dasharray:7 8; }
+    .lore-core {
+      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+      width:176px; height:176px; border-radius:50%; display:grid; place-items:center;
+      background:#fffef8; border:2px solid rgba(30,20,16,.12);
+      box-shadow:0 18px 42px rgba(30,20,16,.14);
+      font-family:'Playfair Display',Georgia,serif; font-size:2.2rem; font-weight:900; color:var(--ink);
+    }
+    .lore-node {
+      position:absolute; left:var(--x); top:var(--y); transform:translate(-50%,-50%);
+      width:150px; min-height:94px; border-radius:10px; padding:12px 13px;
+      background:rgba(255,255,255,.72); border-top:6px solid var(--c);
+      box-shadow:0 10px 24px rgba(30,20,16,.10); text-align:left;
+    }
+    .lore-node b { display:block; font-family:'Caveat',cursive; font-size:1.25rem; line-height:1.05; color:var(--ink); }
+    .lore-node span { display:block; margin-top:6px; font-family:'Caveat',cursive; font-size:1rem; line-height:1.12; color:var(--muted); font-weight:700; }
+    .change-grid { width:min(100%,900px); margin:26px auto 0; display:grid; grid-template-columns:1fr 1fr; gap:24px; text-align:left; }
+    .change-col { background:rgba(255,255,255,.6); border-radius:12px; padding:24px 26px 22px; box-shadow:0 12px 30px rgba(30,20,16,.08); border-top:6px solid var(--c); }
+    .change-col h3 { font-size:clamp(1.9rem,3.2vw,2.7rem); margin-bottom:16px; color:var(--ink); }
+    .change-list { display:grid; gap:12px; margin:0; padding:0; list-style:none; }
+    .change-list li { display:flex; align-items:baseline; gap:10px; font-family:'Caveat',cursive; font-size:1.38rem; line-height:1.15; color:#2f2b27; font-weight:700; }
+    .change-list li::before { content:""; width:10px; height:10px; border-radius:50%; background:var(--c); flex:0 0 auto; }
+
+    .slide.in-view .eyebrow,
+    .slide.in-view h2,
+    .slide.in-view .big-number,
+    .slide.in-view .lead,
+    .slide.in-view .timeline-road,
+    .slide.in-view .era-data-card,
+    .slide.in-view .wrapped-grid,
+    .slide.in-view .chart-shell,
+    .slide.in-view .chart-note,
+    .slide.in-view .postcard-wrap,
+    .slide.in-view .photo-grid {
+      animation: slideRise .8s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .slide.center.in-view h2 { animation: scaleReveal .85s cubic-bezier(.2,.8,.2,1) .05s both; }
+    .slide.center.in-view .big-number { animation: popIn .9s cubic-bezier(.18,.9,.25,1.15) .06s both; }
+    .slide.in-view .eyebrow { animation-name:pillPop; animation-delay:.02s; }
+    .slide.in-view .big-number { animation-name:numberPop; animation-delay:.05s; transform-origin:center; }
+    .slide.in-view h2 { animation-name:titlePop; animation-delay:.08s; transform-origin:center bottom; }
+    .slide.in-view .lead { animation-delay:.16s; }
+    .slide.in-view .timeline-road,
+    .slide.in-view .era-data-card,
+    .slide.in-view .wrapped-grid,
+    .slide.in-view .chart-shell,
+    .slide.in-view .postcard-wrap { animation-delay:.14s; }
+    .slide.in-view .photo { animation: photoSettle .75s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .year-bar,
+    .slide.in-view .stream-band { animation: growY .85s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .era-chip,
+    .slide.in-view .era-topic,
+    .slide.in-view .insight,
+    .slide.in-view .legend-item,
+    .slide.in-view .change-col { animation: slideRise .7s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .lore-node { animation:lorePop .7s cubic-bezier(.18,.9,.25,1.18) both; }
+    .slide.in-view .ms-dot { animation:popDot .52s cubic-bezier(.18,.9,.25,1.28) both; box-shadow: 0 0 0 6px rgba(192,75,96,.25) !important; }
+    .slide.in-view .ms-label,
+    .slide.in-view .ms-count,
+    .slide.in-view .ms-year { animation:slideRise .55s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .milestone { animation: staggerSlideIn .6s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .photo-wrap:nth-child(1) .photo,
+    .slide.in-view .era-chip:nth-child(1),
+    .slide.in-view .era-topic:nth-child(1),
+    .slide.in-view .insight:nth-child(1),
+    .slide.in-view .legend-item:nth-child(1),
+    .slide.in-view .stream-year:nth-child(1) .stream-band,
+    .slide.in-view .year-bar:nth-child(1) { animation-delay:.06s; }
+    .slide.in-view .photo-wrap:nth-child(2) .photo,
+    .slide.in-view .era-chip:nth-child(2),
+    .slide.in-view .era-topic:nth-child(2),
+    .slide.in-view .insight:nth-child(2),
+    .slide.in-view .legend-item:nth-child(2),
+    .slide.in-view .stream-year:nth-child(2) .stream-band,
+    .slide.in-view .year-bar:nth-child(2),
+    .slide.in-view .milestone:nth-child(1) { animation-delay:.02s; }
+    .slide.in-view .milestone:nth-child(2) { animation-delay:.08s; }
+    .slide.in-view .milestone:nth-child(3) { animation-delay:.14s; }
+    .slide.in-view .milestone:nth-child(4) { animation-delay:.20s; }
+    .slide.in-view .milestone:nth-child(5) { animation-delay:.26s; }
+    .slide.in-view .milestone:nth-child(6) { animation-delay:.32s; }
+    .slide.in-view .milestone:nth-child(7) { animation-delay:.38s; }
+    .slide.in-view .milestone:nth-child(8) { animation-delay:.44s; }
+    .slide.in-view .milestone:nth-child(2) .ms-dot { animation-delay:.12s; }
+    .slide.in-view .photo-wrap:nth-child(3) .photo,
+    .slide.in-view .era-chip:nth-child(3),
+    .slide.in-view .era-topic:nth-child(3),
+    .slide.in-view .insight:nth-child(3),
+    .slide.in-view .legend-item:nth-child(3),
+    .slide.in-view .stream-year:nth-child(3) .stream-band,
+    .slide.in-view .year-bar:nth-child(3),
+    .slide.in-view .milestone:nth-child(3) .ms-dot { animation-delay:.18s; }
+    .slide.in-view .photo-wrap:nth-child(4) .photo,
+    .slide.in-view .era-topic:nth-child(4),
+    .slide.in-view .insight:nth-child(4),
+    .slide.in-view .legend-item:nth-child(4),
+    .slide.in-view .stream-year:nth-child(4) .stream-band,
+    .slide.in-view .year-bar:nth-child(4),
+    .slide.in-view .milestone:nth-child(4) .ms-dot { animation-delay:.24s; }
+    .slide.in-view .stat { animation: popIn .65s cubic-bezier(.18,.9,.25,1.15) both !important; }
+    .slide.in-view .stat:nth-child(1) { animation-delay:.10s; }
+    .slide.in-view .stat:nth-child(2) { animation-delay:.16s; }
+    .slide.in-view .stat:nth-child(3) { animation-delay:.22s; }
+    .slide.in-view .insight:nth-child(5),
+    .slide.in-view .legend-item:nth-child(5),
+    .slide.in-view .stream-year:nth-child(5) .stream-band,
+    .slide.in-view .year-bar:nth-child(5),
+    .slide.in-view .milestone:nth-child(5) .ms-dot { animation-delay:.30s; }
+    .slide.in-view .insight:nth-child(6),
+    .slide.in-view .legend-item:nth-child(6),
+    .slide.in-view .stream-year:nth-child(6) .stream-band,
+    .slide.in-view .year-bar:nth-child(6),
+    .slide.in-view .milestone:nth-child(6) .ms-dot { animation-delay:.36s; }
+    .slide.in-view .legend-item:nth-child(7),
+    .slide.in-view .stream-year:nth-child(7) .stream-band,
+    .slide.in-view .year-bar:nth-child(7),
+    .slide.in-view .milestone:nth-child(7) .ms-dot { animation-delay:.42s; }
+    .slide.in-view .stream-year:nth-child(8) .stream-band,
+    .slide.in-view .year-bar:nth-child(8),
+    .slide.in-view .milestone:nth-child(8) .ms-dot { animation-delay:.48s; }
+    .slide.in-view .stream-year:nth-child(9) .stream-band,
+    .slide.in-view .year-bar:nth-child(9) { animation-delay:.54s; }
+    .slide.in-view .lore-node:nth-of-type(2) { animation-delay:.08s; }
+    .slide.in-view .lore-node:nth-of-type(3) { animation-delay:.14s; }
+    .slide.in-view .lore-node:nth-of-type(4) { animation-delay:.20s; }
+    .slide.in-view .lore-node:nth-of-type(5) { animation-delay:.26s; }
+    .slide.in-view .lore-node:nth-of-type(6) { animation-delay:.32s; }
+    .slide.in-view .lore-node:nth-of-type(7) { animation-delay:.38s; }
+    .slide.in-view .lore-node:nth-of-type(8) { animation-delay:.44s; }
+    .slide.in-view .change-col:nth-child(1) { animation-delay:.10s; }
+    .slide.in-view .change-col:nth-child(2) { animation-delay:.20s; }
+    .slide.in-view .five-card { animation: popIn .6s cubic-bezier(.18,.9,.25,1.15) both; }
+    .slide.in-view .five-card:nth-child(1) { animation-delay:.08s; }
+    .slide.in-view .five-card:nth-child(2) { animation-delay:.14s; }
+    .slide.in-view .five-card:nth-child(3) { animation-delay:.20s; }
+    .slide.in-view .five-card:nth-child(4) { animation-delay:.26s; }
+    .slide.in-view .five-card:nth-child(5) { animation-delay:.32s; }
+    .slide.in-view .badge { animation: slideRise .5s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .badge:nth-child(1) { animation-delay:.10s; }
+    .slide.in-view .badge:nth-child(2) { animation-delay:.16s; }
+    .slide.in-view .badge:nth-child(3) { animation-delay:.22s; }
+    .slide.in-view .badge:nth-child(4) { animation-delay:.28s; }
+    .slide.in-view .badge:nth-child(5) { animation-delay:.34s; }
+    @keyframes slideRise { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes titlePop { from { opacity:0; transform:translateY(24px) scale(.96); filter:blur(4px); } to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } }
+    @keyframes pillPop { from { opacity:0; transform:translateY(12px) scale(.88); } to { opacity:1; transform:translateY(0) scale(1); } }
+    @keyframes numberPop { 0% { opacity:0; transform:translateY(18px) scale(.84) rotate(-3deg); } 70% { opacity:1; transform:translateY(0) scale(1.04) rotate(1deg); } 100% { opacity:1; transform:translateY(0) scale(1) rotate(0); } }
+    @keyframes photoSettle { from { opacity:0; transform:translateY(16px) rotate(calc(var(--tilt,-2deg) - 5deg)) scale(.96); } to { opacity:1; transform:rotate(var(--tilt,-2deg)) scale(1); } }
+    @keyframes growY { from { transform:scaleY(.08); opacity:.45; } to { transform:scaleY(1); opacity:1; } }
+    @keyframes growX { from { transform:scaleX(.05); opacity:.45; } to { transform:scaleX(1); opacity:1; } }
+    @keyframes drawLine { to { stroke-dashoffset:0; } }
+    @keyframes popDot { from { opacity:0; transform:scale(.2); } to { opacity:1; transform:scale(1); } }
+    @keyframes lorePop { from { opacity:0; transform:translate(-50%,-42%) scale(.86); } to { opacity:1; transform:translate(-50%,-50%) scale(1); } }
+    @keyframes slideSheen { 0% { opacity:0; transform:translateX(-120%); } 20% { opacity:.7; } 100% { opacity:0; transform:translateX(120%); } }
+    @keyframes slideExit { 0% { opacity:1; transform:translateY(0) scale(1); } 100% { opacity:0; transform:translateY(24px) scale(.98); } }
+    @keyframes slideExitUp { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-40px); } }
+    @keyframes popIn { 0% { opacity:0; transform:scale(.85) translateY(20px); } 50% { transform:scale(1.02); } 100% { opacity:1; transform:scale(1) translateY(0); } }
+    @keyframes scaleReveal { 0% { opacity:0; transform:scale(0.92); filter:blur(8px); } 100% { opacity:1; transform:scale(1); filter:blur(0); } }
+    @keyframes buttonPulse { 0% { transform:scale(1); } 50% { transform:scale(1.15); } 100% { transform:scale(1); } }
+    @keyframes staggerSlideIn { from { opacity:0; transform:translateY(16px) scale(.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-snap-type:none; }
+      .slide.in-view *,
+      .slide.in-view::after { animation:none !important; transition:none !important; }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 860px) {
+      .slide { padding: 24px 18px 32px; }
+      .slide-inner, .slide.media-left .slide-inner { grid-template-columns: 1fr; gap: 22px; }
+      .slide.media-left .copy, .slide.media-left .visual { order: initial; }
+      h2 { font-size: clamp(1.9rem,10vw,3rem); }
+      h3 { font-size: clamp(1.9rem,10vw,3.2rem); }
+      .lead { font-size: 1rem; }
+      .photo { width: min(100%,340px); }
+      .stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .stat { min-height: 90px; padding: 13px; }
+      .photo-grid { grid-template-columns: repeat(3,1fr); }
+      .video-strip { grid-template-columns: 1fr; }
+      .topbar { font-size: .88rem; }
+      .dots { max-width: 50vw; }
+      .brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .password-row { grid-template-columns: 1fr; }
+      .five-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 520px) {
+      .slide { padding: 20px 14px 28px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .bottombar { gap: 8px; }
+      .icon-btn { width: 42px; height: 42px; }
+      .big-number { font-size: clamp(4rem,16vw,10rem); }
+      .five-grid { grid-template-columns: 1fr; }
+      .era-data-card { grid-template-columns: 1fr; gap: 20px; }
+      .era-photos { grid-template-columns: 1fr 1fr; }
+      .timeline-road { flex-wrap: wrap; gap: 12px; }
+      .milestone { min-width: 80px; flex: 0 0 calc(25% - 12px); }
+      .milestone:not(:last-child)::after { display: none; }
+    }
+
+    /* TIMELINE ROAD (slide 2) */
+    .timeline-road { display:flex; align-items:flex-start; gap:0; margin-top:32px; overflow-x:auto; padding-bottom:12px; }
+    .milestone { display:flex; flex-direction:column; align-items:center; flex:1; min-width:90px; position:relative; }
+    .milestone:not(:last-child)::after { content:''; position:absolute; top:14px; left:50%; width:100%; height:2px; background:repeating-linear-gradient(90deg,var(--accent-local) 0,var(--accent-local) 6px,transparent 6px,transparent 12px); z-index:0; }
+    .ms-dot { width:28px; height:28px; border-radius:50%; background:var(--accent-local); border:4px solid #ede0cc; z-index:1; position:relative; flex-shrink:0; }
+    .milestone:last-child .ms-dot { box-shadow:0 0 0 6px rgba(184,64,48,.15), 0 0 20px var(--accent-local); }
+    .ms-year { font-family:'Caveat',cursive; font-size:1.34rem; font-weight:700; color:var(--eyebrow-color,var(--muted)); margin-top:10px; }
+    .ms-label { font-family:'Caveat',cursive; font-size:1.18rem; color:var(--muted); text-align:center; line-height:1.22; margin-top:4px; padding:0 4px; }
+    .ms-count { font-family:'Caveat',cursive; font-size:.98rem; color:var(--accent-local,var(--rose)); font-weight:700; line-height:1.05; margin-top:4px; white-space:nowrap; }
+
+    /* ERA DATA CARD (slides 3–6) */
+    .era-data-card { display:grid; grid-template-columns:.9fr 1.1fr; gap:34px; margin-top:22px; align-items:center; text-align:left; }
+    .era-meta { display:flex; flex-direction:column; gap:15px; }
+    .era-chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .era-chip { font-family:'Caveat',cursive; font-size:1.26rem; font-weight:700; background:rgba(255,255,255,.44); border:1px solid rgba(30,20,16,.08); border-radius:22px; padding:7px 17px; color:var(--ink); }
+    .era-topics { display:flex; flex-wrap:wrap; gap:8px; }
+    .era-topic { font-family:'Caveat',cursive; font-size:1.12rem; background:var(--accent-local); color:#fff; border-radius:6px; padding:6px 14px; opacity:.9; }
+    .era-quote-block { font-family:'Caveat',cursive; font-size:1.56rem; font-style:italic; color:var(--ink); line-height:1.28; border-left:5px solid var(--accent-local); padding:13px 18px; background:rgba(255,255,255,.5); border-radius:0 9px 9px 0; }
+    .era-quote-block small { display:block; font-size:1.04rem; color:var(--muted); font-style:normal; margin-top:8px; }
+    .era-photos { display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start; }
+    .era-photos .photo-wrap { width:100%; margin:0; }
+    .era-photos .photo { width:100%; height:clamp(145px,16vw,195px); object-fit:cover; background:#fff; border-width:8px; border-bottom-width:34px; }
+
+    /* RESPONSIVE — new components */
+    @media (max-width:860px) {
+      .era-data-card { grid-template-columns:1fr; }
+      .ms-label { font-size:.96rem; }
+      .ms-count { font-size:.84rem; }
+      .wrapped-grid { grid-template-columns:1fr; }
+      .insight-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .year-bars { height:210px; gap:6px; }
+      .year-bar::before { font-size:.78rem; }
+      .stream-chart { height:300px; gap:8px; padding:18px 10px 40px; }
+      .lore-map { height:610px; }
+      .lore-core { width:138px; height:138px; font-size:1.8rem; }
+      .lore-node { width:132px; min-height:86px; padding:10px 11px; }
+      .change-grid { grid-template-columns:1fr; gap:16px; }
+      .postcard-wrap { padding-right:clamp(22px,4vw,44px); }
+      .postcard-wrap::after { display:none; }
+    }
+
+    @media (max-width:520px) {
+      .era-photos .photo { height:clamp(118px,34vw,150px); }
+      .insight-grid { grid-template-columns:1fr; }
+      .wrapped-hero { padding:20px; }
+      .year-bars { grid-template-columns:repeat(9,minmax(0,1fr)); gap:4px; padding-left:2px; padding-right:2px; }
+      .year-bar { border-radius:6px 6px 2px 2px; }
+      .year-bar::before { font-size:.6rem; }
+      .year-bar span { font-size:.72rem; bottom:-25px; }
+      .chart-shell { margin-top:18px; }
+      .chart-legend { gap:7px 10px; }
+      .legend-item { font-size:.92rem; }
+      .stream-chart { height:245px; gap:5px; padding-left:4px; padding-right:4px; }
+      .stream-year::after { font-size:.72rem; bottom:-27px; }
+      .stream-year::before { display:none; }
+      .stream-band { border-radius:3px; }
+      .lore-map { height:auto; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+      .lore-lines, .lore-core { display:none; }
+      .lore-node { position:static; transform:none; width:auto; min-height:82px; }
+      .slide.in-view .lore-node { animation:slideRise .7s cubic-bezier(.2,.8,.2,1) both; }
+      .lore-node b { font-size:1.05rem; }
+      .lore-node span { font-size:.88rem; }
+      .change-col { padding:18px 18px 17px; }
+      .change-list li { font-size:1.18rem; }
+    }
+
+    /* ZOOM BUTTON */
+    .photo-zoom-btn {
+      position:absolute; bottom:5px; right:7px;
+      width:24px; height:24px; border-radius:50%;
+      background:rgba(20,16,12,.48); border:0; cursor:pointer;
+      display:grid; place-items:center; font-size:.8rem; color:white;
+      z-index:2; transition:background .15s, transform .15s;
+    }
+    .photo-zoom-btn:hover { background:rgba(20,16,12,.82); transform:scale(1.12); }
+
+    /* LIGHTBOX */
+    .lightbox { position:fixed; inset:0; z-index:200; display:none; place-items:center; padding:24px; }
+    .lightbox.open { display:grid; }
+    .lb-bg { position:absolute; inset:0; background:rgba(0,0,0,.84); cursor:pointer; backdrop-filter:blur(6px); }
+    .lb-inner { position:relative; z-index:1; max-width:min(90vw,880px); }
+    .lb-img { width:100%; height:auto; max-height:84dvh; object-fit:contain; display:block;
+      border:12px solid #fff; border-bottom-width:56px; border-radius:3px;
+      filter:sepia(.04) saturate(.95); box-shadow:0 20px 60px rgba(0,0,0,.45); }
+    .lb-caption { position:absolute; bottom:10px; left:0; right:0; text-align:center;
+      font-family:'Caveat',cursive; font-size:1.1rem; color:#5a4030; pointer-events:none; }
+    .lb-close { position:absolute; top:-15px; right:-15px; width:38px; height:38px;
+      border-radius:50%; background:white; border:0; cursor:pointer; font-size:1.15rem;
+      display:grid; place-items:center; box-shadow:0 4px 16px rgba(0,0,0,.28);
+      color:var(--ink); transition:transform .15s; }
+    .lb-close:hover { transform:scale(1.12); }
+  </style>
+</head>
+<body>
+
+<div class="lock" id="lock">
+  <form class="lock-box" id="lockForm">
+    <div class="big-number" style="margin-bottom:8px">23</div>
+    <h1>İrem günü</h1>
+    <p>Bu slayt deck'i sadece davetlilere açık.<br>Şifreyi gir, doğum günü arşivi başlasın.</p>
+    <div class="password-row">
+      <input id="password" inputmode="numeric" autocomplete="off" placeholder="Şifre" aria-label="Şifre">
+      <button class="btn" type="submit">Gir →</button>
+    </div>
+    <div class="error" id="error" aria-live="polite"></div>
+  </form>
+</div>
+
+<main class="app" aria-live="polite">
+  <header class="topbar">
+    <div class="brand"><span class="brand-dot">✦</span><span>İrem'in 23. yaş günü</span></div>
+    <div class="counter" id="counter">1 / 10</div>
+  </header>
+
+  <section class="stage" id="stage">
+    <div class="slides" id="slides">
+
+      <!-- 1: COVER -->
+      <article class="slide era-1 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">21 Mayıs 2026 · Doğum günü arşivi</div>
+            <div class="big-number" style="margin:14px 0 8px">23</div>
+            <h2>İyi ki doğdun İrem.</h2>
+            <p class="lead">8 yıl · 2 ülke · 16.315 mesaj · 1 arşiv.</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2: TİMLİNE -->
+      <article class="slide era-1 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">2018 → 2026 / sekiz yılın haritası</div>
+            <h2>Nereden nereye.</h2>
+            <div class="timeline-road">
+              <div class="milestone">
+                <div class="ms-dot"></div>
+                <div class="ms-year">2018</div>
+                <div class="ms-label">İlk mesaj</div>
+                <div class="ms-count">308 mesaj</div>
+              </div>
+              <div class="milestone">
+                <div class="ms-dot"></div>
+                <div class="ms-year">2019</div>
+                <div class="ms-label">Fotoğraf dönemi</div>
+                <div class="ms-count">3.042 mesaj</div>
+              </div>
+              <div class="milestone">
+                <div class="ms-dot"></div>
+                <div class="ms-year">2020</div>
+                <div class="ms-label">Pandemi, evler</div>
+                <div class="ms-count">629 mesaj</div>
+              </div>
+              <div class="milestone">
+                <div class="ms-dot"></div>
+                <div class="ms-year">2021</div>
+                <div class="ms-label">"Handstand yakında"</div>
+                <div class="ms-count">1.184 mesaj</div>
+              </div>
+              <div class="milestone">
+                <div class="ms-dot"></div>
+                <div class="ms-year">2022</div>
+                <div class="ms-label">"Gurbette görüşelim"</div>
+                <div class="ms-count">536 mesaj</div>
+              </div>
+              <div class="milestone">
+                <div class="ms-dot"></div>
+                <div class="ms-year">2023</div>
+                <div class="ms-label">Almanya 🇩🇪</div>
+                <div class="ms-count">4.297 mesaj</div>
+              </div>
+              <div class="milestone">
+                <div class="ms-dot"></div>
+                <div class="ms-year">2024</div>
+                <div class="ms-label">Kafe modu</div>
+                <div class="ms-count">2.980 mesaj</div>
+              </div>
+              <div class="milestone">
+                <div class="ms-dot"></div>
+                <div class="ms-year">2025–26</div>
+                <div class="ms-label">23'e koşu</div>
+                <div class="ms-count">3.339 mesaj</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3: ERA 1 — 2018–2020 -->
+      <article class="slide era-2 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">2018–2019 / lise, fotoğraf, başlangıçlar</div>
+            <h2>Era 1: İlk Yıllar</h2>
+            <div class="era-data-card">
+              <div class="era-meta">
+                <div class="era-chips">
+                  <span class="era-chip">3.350 mesaj</span>
+                  <span class="era-chip">Lise son</span>
+                  <span class="era-chip">İlk staj</span>
+                </div>
+                <div class="era-topics">
+                  <span class="era-topic">Fotoğrafçılık</span>
+                  <span class="era-topic">Lightroom tartışması</span>
+                  <span class="era-topic">Okul stresi</span>
+                  <span class="era-topic">MODYO</span>
+                </div>
+                <div class="era-quote-block">
+                  “Fotoğraf çekeriz”
+                  <small>— İrem, 8 Haziran 2019</small>
+                </div>
+              </div>
+              <div class="era-photos">
+                <div class="photo-wrap" style="--tilt:-1.5deg">
+                  <img class="photo" src="assets/IMG-20180316-WA0001.webp" alt="2018">
+                </div>
+                <div class="photo-wrap" style="--tilt:1.5deg">
+                  <img class="photo" src="assets/IMG-20190901-WA0004.webp" alt="2019">
+                </div>
+                <div class="photo-wrap" style="--tilt:-1deg">
+                  <img class="photo" src="assets/IMG-20190903-WA0027.webp" alt="2019">
+                </div>
+                <div class="photo-wrap" style="--tilt:2deg">
+                  <img class="photo" src="assets/IMG-20190903-WA0031.webp" alt="2019">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4: ERA 2 — 2020–2022 -->
+      <article class="slide era-3 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">2020–2022 / pandemi, üniversite, büyüme</div>
+            <h2>Era 2: Pandemi Yılları</h2>
+            <div class="era-data-card">
+              <div class="era-meta">
+                <div class="era-chips">
+                  <span class="era-chip">2.349 mesaj</span>
+                  <span class="era-chip">Üniversite başlangıcı</span>
+                  <span class="era-chip">Evde kapalı</span>
+                </div>
+                <div class="era-topics">
+                  <span class="era-topic">Sabah yogası</span>
+                  <span class="era-topic">Handstand hedefi</span>
+                  <span class="era-topic">Almanya planları</span>
+                  <span class="era-topic">Kariyer kafası</span>
+                </div>
+                <div class="era-quote-block">
+                  "Ben 3 aydır sabah 6'da kalkıp yoga yapıyorum. Handstand yakında."
+                  <small>— İrem, 2021</small>
+                </div>
+              </div>
+              <div class="era-photos">
+                <div class="photo-wrap" style="--tilt:-2deg">
+                  <img class="photo" src="assets/IMG-20200404-WA0016.webp" alt="2020">
+                </div>
+                <div class="photo-wrap" style="--tilt:1.5deg">
+                  <img class="photo" src="assets/IMG-20210125-WA0006.webp" alt="2021">
+                </div>
+                <div class="photo-wrap" style="--tilt:1deg">
+                  <img class="photo" src="assets/IMG-20210927-WA0006.webp" alt="2021">
+                </div>
+                <div class="photo-wrap" style="--tilt:-1.5deg">
+                  <img class="photo" src="assets/IMG-20211117-WA0009.webp" alt="2021">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 5: ERA 3 — 2022–2025 -->
+      <article class="slide era-4 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">2023–2024 / Almanya, yeni ritim, büyüyen hayat</div>
+            <h2>Era 3: Almanya Dönemi</h2>
+            <div class="era-data-card">
+              <div class="era-meta">
+                <div class="era-chips">
+                  <span class="era-chip">7.277 mesaj</span>
+                  <span class="era-chip">İki şehir</span>
+                  <span class="era-chip">DB/tren 26 kez</span>
+                </div>
+                <div class="era-topics">
+                  <span class="era-topic">Almanya hayatı</span>
+                  <span class="era-topic">Münih keşifleri</span>
+                  <span class="era-topic">Film festivali</span>
+                  <span class="era-topic">Kafe kültürü</span>
+                </div>
+                <div class="era-quote-block">
+                  “DB pazartesi salı streikteymiş yine.”
+                  <small>— İrem, 11 Mayıs 2023</small>
+                </div>
+              </div>
+              <div class="era-photos">
+                <div class="photo-wrap" style="--tilt:-1.5deg">
+                  <img class="photo" src="assets/IMG-20230521-WA0004.webp" alt="2023">
+                </div>
+                <div class="photo-wrap" style="--tilt:2deg">
+                  <img class="photo" src="assets/IMG-20230609-WA0016.webp" alt="2023">
+                </div>
+                <div class="photo-wrap" style="--tilt:1deg">
+                  <img class="photo" src="assets/IMG-20230908-WA0003.webp" alt="2023">
+                </div>
+                <div class="photo-wrap" style="--tilt:-2deg">
+                  <img class="photo" src="assets/IMG-20241020-WA0001.webp" alt="2024">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 6: ERA 4 — 2025–2026 -->
+      <article class="slide era-4 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">2025–2026 / son bir yıl</div>
+            <h2>Era 4: Yıl 22</h2>
+            <div class="era-data-card">
+              <div class="era-meta">
+                <div class="era-chips">
+                  <span class="era-chip">3.339 mesaj</span>
+                  <span class="era-chip">Kreatin dönemi</span>
+                  <span class="era-chip">İş mülakat serisi</span>
+                </div>
+                <div class="era-topics">
+                  <span class="era-topic">Gym &amp; fitness</span>
+                  <span class="era-topic">Allianz mülakatı</span>
+                  <span class="era-topic">Bisiklet</span>
+                  <span class="era-topic">Miss independent</span>
+                </div>
+                <div class="era-quote-block">
+                  “Bi porsiyon protein tozu bi porsiyon kreatin 3 yumurta + peynir süt”
+                  <small>— İrem, 1 Şubat 2026</small>
+                </div>
+              </div>
+              <div class="era-photos">
+                <div class="photo-wrap" style="--tilt:-2deg">
+                  <img class="photo" src="assets/IMG-20260201-WA0009.webp" alt="2026">
+                </div>
+                <div class="photo-wrap" style="--tilt:1.5deg">
+                  <img class="photo" src="assets/IMG-20260327-WA0002.webp" alt="2026">
+                </div>
+                <div class="photo-wrap" style="--tilt:1deg">
+                  <img class="photo" src="assets/IMG-20241015-WA0021.webp" alt="work setup">
+                </div>
+                <div class="photo-wrap" style="--tilt:-1.5deg">
+                  <img class="photo" src="assets/IMG-20260327-WA0005.webp" alt="2026">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 7: İREM 2.0 SİSTEM ÖZELLİKLERİ -->
+      <article class="slide era-4 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">WhatsApp Wrapped · gerçek arşiv ölçümü</div>
+            <h2>Arşiv bunu söylüyor.</h2>
+            <div class="wrapped-grid">
+              <div class="wrapped-hero">
+                <div class="wrapped-number">16.315</div>
+                <div class="wrapped-title">mesajlık dostluk verisi</div>
+                <p class="wrapped-sub">Emre 8.302, İrem 8.013 mesaj atmış. Sekiz yılda fark sadece 289: konuşma dengesi neredeyse İsviçre saati.</p>
+                <p class="wrapped-sub">En yoğun gün: <strong>25 Ocak 2021</strong>. Tam <strong>279 mesaj</strong>. Telefon muhtemelen izin istemiştir.</p>
+              </div>
+              <div class="wrapped-proof">
+                <div class="year-bars" aria-label="Yıllara göre mesaj sayısı">
+                  <div class="year-bar" style="--h:7%" data-count="308"><span>2018</span></div>
+                  <div class="year-bar" style="--h:71%" data-count="3.042"><span>2019</span></div>
+                  <div class="year-bar" style="--h:15%" data-count="629"><span>2020</span></div>
+                  <div class="year-bar" style="--h:28%" data-count="1.184"><span>2021</span></div>
+                  <div class="year-bar" style="--h:12%" data-count="536"><span>2022</span></div>
+                  <div class="year-bar" style="--h:100%" data-count="4.297"><span>2023</span></div>
+                  <div class="year-bar" style="--h:69%" data-count="2.980"><span>2024</span></div>
+                  <div class="year-bar" style="--h:42%" data-count="1.790"><span>2025</span></div>
+                  <div class="year-bar" style="--h:36%" data-count="1.549"><span>2026</span></div>
+                </div>
+                <div class="insight-grid">
+                  <div class="insight"><b>56</b><span>kahve / kafe / latte sinyali</span></div>
+                  <div class="insight"><b>26</b><span>DB, tren, streik krizi</span></div>
+                  <div class="insight"><b>48</b><span>gym, squat, kreatin log'u</span></div>
+                  <div class="insight"><b>49</b><span>fotoğraf, Lightroom, kamera kavgası</span></div>
+                  <div class="insight"><b>887</b><span>medya anı: foto, video, sticker, ses</span></div>
+                  <div class="insight"><b>19:00</b><span>arşivin prime-time saati</span></div>
+                </div>
+              </div>
+            </div>
+            <p class="wrapped-foot">Bonus ölçüm: "zort" 12 kez geçiyor. Bilim bunu da not aldı.</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 8: TOPIC EVOLUTION -->
+      <article class="slide era-5 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">Konu evrimi · 2018 → 2026</div>
+            <h2>Arkadaşlık tür değiştirdi.</h2>
+            <div class="chart-shell">
+              <div class="stream-chart" aria-label="Yıllara göre konu yoğunluğu">
+                <div class="stream-year" data-year="2018" data-total="14" style="--total:13">
+                  <div class="stream-band c-creative" style="--v:8.4;--min:9px"></div>
+                  <div class="stream-band c-logistics" style="--v:2.8;--min:6px"></div>
+                  <div class="stream-band c-school" style="--v:1.9;--min:6px"></div>
+                </div>
+                <div class="stream-year" data-year="2019" data-total="193" style="--total:70">
+                  <div class="stream-band c-warm" style="--v:30.2"></div>
+                  <div class="stream-band c-creative" style="--v:12.3"></div>
+                  <div class="stream-band c-logistics" style="--v:9.6"></div>
+                  <div class="stream-band c-coffee" style="--v:4.8"></div>
+                </div>
+                <div class="stream-year" data-year="2020" data-total="30" style="--total:19">
+                  <div class="stream-band c-logistics" style="--v:9.6"></div>
+                  <div class="stream-band c-creative" style="--v:5.7"></div>
+                  <div class="stream-band c-fitness" style="--v:5.7"></div>
+                </div>
+                <div class="stream-year" data-year="2021" data-total="54" style="--total:29">
+                  <div class="stream-band c-warm" style="--v:16.2"></div>
+                  <div class="stream-band c-school" style="--v:14.2"></div>
+                  <div class="stream-band c-fitness" style="--v:9.5"></div>
+                  <div class="stream-band c-creative" style="--v:5.7"></div>
+                </div>
+                <div class="stream-year" data-year="2022" data-total="34" style="--total:21">
+                  <div class="stream-band c-school" style="--v:12.3"></div>
+                  <div class="stream-band c-logistics" style="--v:7.6"></div>
+                  <div class="stream-band c-warm" style="--v:4.7"></div>
+                </div>
+                <div class="stream-year" data-year="2023" data-total="317" style="--total:96">
+                  <div class="stream-band c-warm" style="--v:39.9"></div>
+                  <div class="stream-band c-logistics" style="--v:28.5"></div>
+                  <div class="stream-band c-creative" style="--v:11.4"></div>
+                  <div class="stream-band c-school" style="--v:6.9"></div>
+                  <div class="stream-band c-coffee" style="--v:4.5"></div>
+                </div>
+                <div class="stream-year" data-year="2024" data-total="316" style="--total:77">
+                  <div class="stream-band c-warm" style="--v:39"></div>
+                  <div class="stream-band c-logistics" style="--v:12.9"></div>
+                  <div class="stream-band c-creative" style="--v:7.8"></div>
+                  <div class="stream-band c-school" style="--v:6.9"></div>
+                </div>
+                <div class="stream-year" data-year="2025" data-total="107" style="--total:34">
+                  <div class="stream-band c-warm" style="--v:32.1"></div>
+                  <div class="stream-band c-school" style="--v:17"></div>
+                  <div class="stream-band c-logistics" style="--v:15.1"></div>
+                  <div class="stream-band c-creative" style="--v:12.3"></div>
+                </div>
+                <div class="stream-year" data-year="2026" data-total="114" style="--total:37">
+                  <div class="stream-band c-career" style="--v:41.8"></div>
+                  <div class="stream-band c-fitness" style="--v:18"></div>
+                  <div class="stream-band c-warm" style="--v:12.3"></div>
+                  <div class="stream-band c-school" style="--v:9.5"></div>
+                </div>
+              </div>
+              <div class="chart-legend">
+                <span class="legend-item"><i class="legend-dot c-warm"></i>iyi enerji</span>
+                <span class="legend-item"><i class="legend-dot c-logistics"></i>lojistik</span>
+                <span class="legend-item"><i class="legend-dot c-creative"></i>yaratıcılık</span>
+                <span class="legend-item"><i class="legend-dot c-school"></i>okul</span>
+                <span class="legend-item"><i class="legend-dot c-career"></i>kariyer</span>
+                <span class="legend-item"><i class="legend-dot c-fitness"></i>fitness</span>
+                <span class="legend-item"><i class="legend-dot c-coffee"></i>kahve</span>
+              </div>
+            </div>
+            <p class="chart-note">2019 fotoğraf ve iyi enerji kaosu, 2023 lojistik patlaması, 2026 ise kariyer + fitness sezonu.</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 9: İREM LORE MAP -->
+      <article class="slide era-5 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">Arşiv haritası · recurring İrem lore</div>
+            <h2>İrem lore haritası.</h2>
+            <div class="lore-map">
+              <svg class="lore-lines" viewBox="0 0 900 470" aria-hidden="true">
+                <line x1="450" y1="235" x2="160" y2="92"></line>
+                <line x1="450" y1="235" x2="450" y2="66"></line>
+                <line x1="450" y1="235" x2="740" y2="92"></line>
+                <line x1="450" y1="235" x2="790" y2="260"></line>
+                <line x1="450" y1="235" x2="640" y2="404"></line>
+                <line x1="450" y1="235" x2="270" y2="404"></line>
+                <line x1="450" y1="235" x2="110" y2="260"></line>
+              </svg>
+              <div class="lore-core">İrem</div>
+              <div class="lore-node c-creative" style="--x:18%;--y:18%"><b>Fotoğraf dönemi</b><span>61 foto/kamera sinyali</span></div>
+              <div class="lore-node c-school" style="--x:50%;--y:10%"><b>Sabah disiplini</b><span>yoga, handstand, okul modu</span></div>
+              <div class="lore-node c-logistics" style="--x:82%;--y:18%"><b>DB krizleri</b><span>26 tren / streik vakası</span></div>
+              <div class="lore-node c-coffee" style="--x:88%;--y:55%"><b>Kahve hattı</b><span>56 kafe / latte / kahve izi</span></div>
+              <div class="lore-node c-career" style="--x:70%;--y:86%"><b>Kariyer sezonu</b><span>2026'da 44 sinyal</span></div>
+              <div class="lore-node c-fitness" style="--x:30%;--y:86%"><b>Protein protokolü</b><span>fitness, squat, kreatin</span></div>
+                <div class="lore-node c-warm" style="--x:12%;--y:55%"><b>İyi enerji izi</b><span>436 güzel / sev / tatlı sinyali</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 10: WHAT CHANGED / WHAT STAYED -->
+      <article class="slide era-4 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">8 yılın özeti · değişenler / kalanlar</div>
+            <h2>Bazı şeyler değişti. Bazıları iyi ki değişmedi.</h2>
+            <div class="change-grid">
+              <div class="change-col c-career">
+                <h3>Değişenler</h3>
+                <ul class="change-list">
+                  <li>ülkeler, şehirler, planlar</li>
+                  <li>okuldan kariyer görüşmelerine geçiş</li>
+                  <li>yoga matından kreatin protokolüne</li>
+                  <li>daha bağımsız, daha net İrem</li>
+                  <li>küçük arşivden 16.315 mesaja</li>
+                </ul>
+              </div>
+              <div class="change-col c-warm">
+                <h3>Kalanlar</h3>
+                <ul class="change-list">
+                  <li>bir şey olunca birbirini bulmak</li>
+                  <li>fotoğraf zevki ve detay hassasiyeti</li>
+                  <li>kahve, kaos ve kısa mesaj ritmi</li>
+                  <li>yardım istemenin rahatlığı</li>
+                  <li>güzel anları birlikte fark etmek</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 11: KAPANIŞ MEKTUBU -->
+      <article class="slide era-5 center">
+        <div class="slide-inner">
+          <div class="copy">
+            <div class="eyebrow">Emre'den postcard · München · 21.05.26</div>
+            <h2>İyi ki varsın.</h2>
+            <div class="postcard-wrap" style="margin-top:20px">
+              <p>İrem,</p>
+              <p>Bu arşive bakıp nostaljik olmamak çok zor.</p>
+              <p>Benim hayatımın çok farklı versiyonlarını gördün. Ortaokuldan liseye, ilk fotoğraf denemelerinden YouTube işlerine, üniversiteden Almanya'daki hayata ve bugüne kadar her dönemde bir şekilde oradaydın, ben de aynı şeyi senin için yapabilmekten çok mutluyum.</p>
+              <p>Umarım yeni yaşın en iyi yaşın olur ve kafanın ucunda kıyısında kimseye bahsetmetmediğin ne dileğin varsa hepsi gerçekleşir.</p>
+              <p>İyi ki doğdun, ve iyi ki varsın.</p>
+              <p>-Emre</p>
+            </div>
+            <div class="badge-row" style="justify-content:center;margin-top:20px">
+              <button class="btn" type="button" id="btnRestart">Başa dön</button>
+              <button class="btn" type="button" id="btnConfetti">🎉 Konfeti</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /slides -->
+  </section>
+
+  <footer class="bottombar">
+    <div class="nav">
+      <button class="icon-btn" id="prev" type="button" aria-label="Önceki slayt">‹</button>
+      <button class="icon-btn" id="next" type="button" aria-label="Sonraki slayt">›</button>
+    </div>
+    <div class="dots" id="dots" aria-label="Slayt noktaları"></div>
+    <button class="icon-btn" id="confettiBtn" type="button" aria-label="Konfeti">✦</button>
+  </footer>
+</main>
+
+<div class="confetti" id="confetti"></div>
+
+<div class="lightbox" id="lightbox">
+  <div class="lb-bg" id="lbBg"></div>
+  <div class="lb-inner">
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <div class="lb-caption" id="lbCaption"></div>
+    <button class="lb-close" id="lbClose" type="button" aria-label="Kapat">✕</button>
+  </div>
+</div>
+
+<script>
+  const PASSWORD    = "2105";
+  const slidesEl   = document.getElementById("slides");
+  const dotsEl     = document.getElementById("dots");
+  const counterEl  = document.getElementById("counter");
+  const stageEl    = document.getElementById("stage");
+  const allSlides  = slidesEl.querySelectorAll(".slide");
+  const total      = allSlides.length;
+  let index        = 0;
+
+  /* Build dots via DOM (no innerHTML) */
+  for (let i = 0; i < total; i++) {
+    const btn = document.createElement("button");
+    btn.className  = "dot";
+    btn.type       = "button";
+    btn.setAttribute("aria-label", (i + 1) + ". slayta git");
+    btn.addEventListener("click", (function(n){ return function(){ goTo(n); }; })(i));
+    dotsEl.appendChild(btn);
+  }
+  const dotEls = dotsEl.querySelectorAll(".dot");
+
+  function syncUI(replay) {
+    counterEl.textContent = (index + 1) + " / " + total;
+    dotEls.forEach(function(d, i){ d.classList.toggle("active", i === index); });
+    if (replay) {
+      allSlides[index].classList.remove("in-view");
+      void allSlides[index].offsetWidth;
+    }
+    allSlides[index].classList.add("in-view");
+  }
+
+  function exitSlide(slideIdx) {
+    allSlides[slideIdx].classList.add("out-view");
+    setTimeout(function() {
+      allSlides[slideIdx].classList.remove("out-view");
+    }, 600);
+  }
+
+  function update(doScroll, replay) {
+    var oldIndex = index;
+    index = Math.max(0, Math.min(index, total - 1));
+
+    if (oldIndex !== index) {
+      exitSlide(oldIndex);
+    }
+
+    if (doScroll !== false) {
+      allSlides[index].scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    syncUI(replay);
+    document.querySelectorAll("video").forEach(function(v, i){
+      if (Math.abs(i - index) > 1) v.pause();
+    });
+    if (doScroll !== false && (index === 0 || index === total - 1)) burstConfetti(50);
+  }
+
+  function goTo(i) { index = Math.max(0, Math.min(i, total - 1)); update(true, true); }
+  function next()  { goTo(index + 1); }
+  function prev()  { goTo(index - 1); }
+
+  /* Track current slide as user scrolls */
+  var slideArr = Array.from(allSlides);
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+        var idx = slideArr.indexOf(entry.target);
+        entry.target.classList.add("in-view");
+        if (idx !== -1 && idx !== index) { index = idx; syncUI(); }
+      }
+    });
+  }, { threshold: 0.4 });
+  slideArr.forEach(function(s){ io.observe(s); });
+
+  document.getElementById("next").addEventListener("click", function() {
+    this.classList.add("pulse");
+    setTimeout(() => this.classList.remove("pulse"), 400);
+    next();
+  });
+  document.getElementById("prev").addEventListener("click", function() {
+    this.classList.add("pulse");
+    setTimeout(() => this.classList.remove("pulse"), 400);
+    prev();
+  });
+  document.getElementById("confettiBtn").addEventListener("click", function(){ burstConfetti(110); });
+  document.getElementById("btnRestart").addEventListener("click", function(){ goTo(0); burstConfetti(120); });
+  document.getElementById("btnConfetti").addEventListener("click", function(){ burstConfetti(200); });
+
+  window.addEventListener("keydown", function(e){
+    if (!document.getElementById("lock").classList.contains("hidden")) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); next(); }
+    if (e.key === "ArrowLeft"  || e.key === "ArrowUp")   { e.preventDefault(); prev(); }
+    if (e.key === "Home") goTo(0);
+    if (e.key === "End")  goTo(total - 1);
+  });
+
+  function burstConfetti(amount) {
+    amount = amount || 90;
+    var root   = document.getElementById("confetti");
+    var colors = ["#c04b60","#e0b84e","#4f9178","#4a6696","#c8634a","#d4734a"];
+    for (var i = 0; i < amount; i++) {
+      var piece = document.createElement("span");
+      piece.className = "piece";
+      if (Math.random() < 0.18) {
+        piece.style.cssText = "left:" + (Math.random()*100) + "%;color:" +
+          colors[Math.floor(Math.random()*colors.length)] +
+          ";background:none;width:auto;height:auto;font-size:" + (10+Math.random()*8) + "px;" +
+          "animation-duration:" + (2.2+Math.random()*2.6) + "s;" +
+          "animation-delay:" + (Math.random()*.4) + "s;";
+        piece.textContent = "♥";
+      } else {
+        piece.style.left = (Math.random()*100) + "%";
+        piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+        piece.style.animationDuration = (2.4+Math.random()*2.4) + "s";
+        piece.style.animationDelay    = (Math.random()*.35) + "s";
+        piece.style.transform         = "rotate(" + (Math.random()*360) + "deg)";
+      }
+      root.appendChild(piece);
+      setTimeout((function(p){ return function(){ p.remove(); }; })(piece), 5400);
+    }
+  }
+
+  function rememberOpen() {
+    try { localStorage.setItem("irem23-open","yes"); } catch(e){}
+  }
+  function wasOpenedBefore() {
+    try { return localStorage.getItem("irem23-open") === "yes"; } catch(e){ return false; }
+  }
+
+  document.getElementById("lockForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var input = document.getElementById("password");
+    var error = document.getElementById("error");
+    if (input.value.trim() === PASSWORD) {
+      rememberOpen();
+      document.getElementById("lock").classList.add("hidden");
+      burstConfetti(160);
+    } else {
+      error.textContent = "Şifre yanlış. Doğum günü komitesi bunu reddetti.";
+      input.select();
+    }
+  });
+
+  /* Zoom buttons — inject into every .photo-wrap */
+  document.querySelectorAll(".photo-wrap .photo").forEach(function(img) {
+    var btn = document.createElement("button");
+    btn.className = "photo-zoom-btn";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Büyüt");
+    btn.textContent = "⊕";
+    btn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      var lbImg = document.getElementById("lbImg");
+      var lbCap = document.getElementById("lbCaption");
+      lbImg.src = img.src;
+      var capEl = img.parentElement.querySelector(".photo-caption");
+      lbCap.textContent = capEl ? capEl.textContent : "";
+      document.getElementById("lightbox").classList.add("open");
+    });
+    img.parentElement.appendChild(btn);
+  });
+
+  /* Lightbox close */
+  function closeLightbox() { document.getElementById("lightbox").classList.remove("open"); }
+  document.getElementById("lbClose").addEventListener("click", closeLightbox);
+  document.getElementById("lbBg").addEventListener("click", closeLightbox);
+  window.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") closeLightbox();
+  });
+
+  update(false);
+  if (wasOpenedBefore()) document.getElementById("lock").classList.add("hidden");
+</script>
+</body>
+</html>
