@@ -409,9 +409,25 @@
     .slide.in-view .wrapped-grid,
     .slide.in-view .chart-shell,
     .slide.in-view .postcard-wrap { animation-delay:.14s; }
-    .slide.in-view .photo { animation: photoSettle .75s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .photo { animation: photoSettle .85s cubic-bezier(.2,.8,.2,1) .2s both; }
+    .slide.in-view .visual { animation: slideRise 1s cubic-bezier(.2,.8,.2,1) .25s both; }
+    .slide.in-view .photo-grid { animation: scaleReveal 1s cubic-bezier(.2,.8,.2,1) .2s both; }
+    .slide.in-view .era-photos { animation: slideRise 1s cubic-bezier(.2,.8,.2,1) .25s both; }
+    .slide.in-view .lore-map { animation: scaleReveal 1.1s cubic-bezier(.2,.8,.2,1) .25s both; }
+    .slide.in-view .wrapped-grid { animation: slideRise 1s cubic-bezier(.2,.8,.2,1) .2s both; }
+    .slide.in-view .stream-chart { animation: scaleReveal .95s cubic-bezier(.2,.8,.2,1) .2s both; }
+    .slide.in-view .change-grid { animation: slideRise 1s cubic-bezier(.2,.8,.2,1) .2s both; }
     .slide.in-view .year-bar,
-    .slide.in-view .stream-band { animation: growY .85s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .stream-band { animation: growY 1s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .era-chip { animation: popIn .7s cubic-bezier(.18,.9,.25,1.15) both; }
+    .slide.in-view .era-chip:nth-child(1) { animation-delay:.3s; }
+    .slide.in-view .era-chip:nth-child(2) { animation-delay:.4s; }
+    .slide.in-view .era-chip:nth-child(3) { animation-delay:.5s; }
+    .slide.in-view .era-topic { animation: slideRise .8s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .era-topic:nth-child(1) { animation-delay:.35s; }
+    .slide.in-view .era-topic:nth-child(2) { animation-delay:.45s; }
+    .slide.in-view .era-topic:nth-child(3) { animation-delay:.55s; }
+    .slide.in-view .era-topic:nth-child(4) { animation-delay:.65s; }
     .slide.in-view .era-chip,
     .slide.in-view .era-topic,
     .slide.in-view .insight,
@@ -423,6 +439,11 @@
     .slide.in-view .ms-count,
     .slide.in-view .ms-year { animation:slideRise .55s cubic-bezier(.2,.8,.2,1) both; }
     .slide.in-view .milestone { animation: staggerSlideIn .6s cubic-bezier(.2,.8,.2,1) both; }
+    .slide.in-view .photo-wrap { animation: popIn .8s cubic-bezier(.18,.9,.25,1.15) both; }
+    .slide.in-view .photo-wrap:nth-child(1) { animation-delay:.25s; }
+    .slide.in-view .photo-wrap:nth-child(2) { animation-delay:.35s; }
+    .slide.in-view .photo-wrap:nth-child(3) { animation-delay:.45s; }
+    .slide.in-view .photo-wrap:nth-child(4) { animation-delay:.55s; }
     .slide.in-view .photo-wrap:nth-child(1) .photo,
     .slide.in-view .era-chip:nth-child(1),
     .slide.in-view .era-topic:nth-child(1),
@@ -454,6 +475,15 @@
     .slide.in-view .stream-year:nth-child(3) .stream-band,
     .slide.in-view .year-bar:nth-child(3),
     .slide.in-view .milestone:nth-child(3) .ms-dot { animation-delay:.18s; }
+    .slide.in-view .photo-grid img { animation: popIn .7s cubic-bezier(.18,.9,.25,1.15) both; }
+    .slide.in-view .photo-grid img:nth-child(1) { animation-delay:.3s; }
+    .slide.in-view .photo-grid img:nth-child(2) { animation-delay:.4s; }
+    .slide.in-view .photo-grid img:nth-child(3) { animation-delay:.5s; }
+    .slide.in-view .sticker-grid img { animation: popIn .7s cubic-bezier(.18,.9,.25,1.15) both; }
+    .slide.in-view .sticker-grid img:nth-child(1) { animation-delay:.3s; }
+    .slide.in-view .sticker-grid img:nth-child(2) { animation-delay:.4s; }
+    .slide.in-view .sticker-grid img:nth-child(3) { animation-delay:.5s; }
+    .slide.in-view video { animation: scaleReveal .9s cubic-bezier(.2,.8,.2,1) .25s both; }
     .slide.in-view .photo-wrap:nth-child(4) .photo,
     .slide.in-view .era-topic:nth-child(4),
     .slide.in-view .insight:nth-child(4),
