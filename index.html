@@ -396,11 +396,11 @@
     .slide.in-view .chart-note,
     .slide.in-view .postcard-wrap,
     .slide.in-view .photo-grid {
-      animation: slideRise .8s cubic-bezier(.2,.8,.2,1) both;
+      animation: slideRise 1s cubic-bezier(.2,.8,.2,1) both !important;
     }
-    .slide.center.in-view h2 { animation: scaleReveal .85s cubic-bezier(.2,.8,.2,1) .05s both; }
-    .slide.center.in-view .big-number { animation: popIn .9s cubic-bezier(.18,.9,.25,1.15) .06s both; }
-    .slide.in-view .eyebrow { animation-name:pillPop; animation-delay:.02s; }
+    .slide.center.in-view h2 { animation: titlePop 1.1s cubic-bezier(.2,.8,.2,1) .08s both !important; }
+    .slide.center.in-view .big-number { animation: numberPop 1.2s cubic-bezier(.18,.9,.25,1.15) .12s both !important; }
+    .slide.in-view .eyebrow { animation: pillPop .7s cubic-bezier(.18,.9,.25,1.15) .05s both !important; }
     .slide.in-view .big-number { animation-name:numberPop; animation-delay:.05s; transform-origin:center; }
     .slide.in-view h2 { animation-name:titlePop; animation-delay:.08s; transform-origin:center bottom; }
     .slide.in-view .lead { animation-delay:.16s; }
@@ -461,10 +461,11 @@
     .slide.in-view .stream-year:nth-child(4) .stream-band,
     .slide.in-view .year-bar:nth-child(4),
     .slide.in-view .milestone:nth-child(4) .ms-dot { animation-delay:.24s; }
-    .slide.in-view .stat { animation: popIn .65s cubic-bezier(.18,.9,.25,1.15) both !important; }
-    .slide.in-view .stat:nth-child(1) { animation-delay:.10s; }
-    .slide.in-view .stat:nth-child(2) { animation-delay:.16s; }
-    .slide.in-view .stat:nth-child(3) { animation-delay:.22s; }
+    .stats-grid .stat { opacity:0; }
+    .slide.in-view .stat { animation: popIn .8s cubic-bezier(.18,.9,.25,1.15) both !important; }
+    .slide.in-view .stats-grid .stat:nth-child(1) { animation-delay:.15s; }
+    .slide.in-view .stats-grid .stat:nth-child(2) { animation-delay:.25s; }
+    .slide.in-view .stats-grid .stat:nth-child(3) { animation-delay:.35s; }
     .slide.in-view .insight:nth-child(5),
     .slide.in-view .legend-item:nth-child(5),
     .slide.in-view .stream-year:nth-child(5) .stream-band,
@@ -505,10 +506,10 @@
     .slide.in-view .badge:nth-child(3) { animation-delay:.22s; }
     .slide.in-view .badge:nth-child(4) { animation-delay:.28s; }
     .slide.in-view .badge:nth-child(5) { animation-delay:.34s; }
-    @keyframes slideRise { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes titlePop { from { opacity:0; transform:translateY(24px) scale(.96); filter:blur(4px); } to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } }
-    @keyframes pillPop { from { opacity:0; transform:translateY(12px) scale(.88); } to { opacity:1; transform:translateY(0) scale(1); } }
-    @keyframes numberPop { 0% { opacity:0; transform:translateY(18px) scale(.84) rotate(-3deg); } 70% { opacity:1; transform:translateY(0) scale(1.04) rotate(1deg); } 100% { opacity:1; transform:translateY(0) scale(1) rotate(0); } }
+    @keyframes slideRise { from { opacity:0; transform:translateY(32px); filter:blur(4px); } to { opacity:1; transform:translateY(0); filter:blur(0); } }
+    @keyframes titlePop { from { opacity:0; transform:translateY(40px) scale(.80); filter:blur(8px); } to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } }
+    @keyframes pillPop { from { opacity:0; transform:translateY(20px) scale(.70); } to { opacity:1; transform:translateY(0) scale(1); } }
+    @keyframes numberPop { 0% { opacity:0; transform:translateY(30px) scale(.60) rotate(-8deg); } 60% { opacity:1; transform:translateY(-4px) scale(1.08) rotate(2deg); } 100% { opacity:1; transform:translateY(0) scale(1) rotate(0); } }
     @keyframes photoSettle { from { opacity:0; transform:translateY(16px) rotate(calc(var(--tilt,-2deg) - 5deg)) scale(.96); } to { opacity:1; transform:rotate(var(--tilt,-2deg)) scale(1); } }
     @keyframes growY { from { transform:scaleY(.08); opacity:.45; } to { transform:scaleY(1); opacity:1; } }
     @keyframes growX { from { transform:scaleX(.05); opacity:.45; } to { transform:scaleX(1); opacity:1; } }
